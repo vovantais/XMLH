@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Js</title>
+</head>
+<style>
+	.curses{
+		font-size: 20px;
+		margin: 20px 10px;
+		letter-spacing: 1px;
+		font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+	}
+	.select{
+		width: 250px;
+		height: 30px;
+		padding:5px 10px;
+		text-transform: uppercase;
+		font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+		font-size: 14px;
+		letter-spacing: 0.8px;
+	}
+	.btn {
+		width:150px;
+		padding: 5px 10px;
+		height: 30px;
+		border: none;
+		text-transform: uppercase;
+		color: white;
+		font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+		font-size: 14px;
+		letter-spacing: 0.8px;
+		background: #445162;
+		border-radius:10px;
+		cursor: pointer;
+	}
+</style>
+<body>
+	<form action="http://www.nbrb.by/API/ExRates/Rates?Periodicity=0" method="GET" id='newform'>
+		<select name="" id="newselect" class="select">
+			<option selected value="0">Выбрать валюту</option>
+		</select>
+		<input type="submit" value="Отправить" class="btn">
+	</form>
+	<div id="money"></div>
+	<script>
+		function exchangeRate(){
+			const xhr = new XMLHttpRequest();
+			xhr.open('GET','http://www.nbrb.by/API/ExRates/Rates?Periodicity=0');
+			xhr.addEventListener('load',function(){
+				const objson= JSON.parse(xhr.response);
+				let DIV = document.getElementById('money');
+				DIV.className='curses';
+				let Select = document.getElementById('newselect');
+				let value = Select.value;
+				objson.forEach(item=>{
+					let Option = document.createElement('option');
+					Option.append(item.Cur_Name);
+					Select.append(Option);
+					const curs = `${item.Cur_Name} <strong>: ${item.Cur_OfficialRate}</strong>`;
+					if(item.Cur_Name.includes(value)){
+						DIV.innerHTML=curs;
+					}
+				});
+			});
+			xhr.send();
+		}
+		document.addEventListener('DOMContentLoaded',function(){
+			const Curs = document.getElementById('newform');
+			Curs.addEventListener('submit',function(event){
+				event.preventDefault();
+				exchangeRate();
+			});
+		});
+		exchangeRate();
+		
+	</script>
+</body>
+</html>
